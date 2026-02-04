@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Summarizer - Get Clean Summaries in Seconds</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Hero Section - Value Prop Above Fold -->
+    <div class="hero">
+        <div class="container">
+            <h1 class="headline">Upload a PDF. Get a clean summary in seconds.</h1>
+            <p class="subheadline">No signup. No BS. Just instant, accurate summaries.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        
+        <!-- Upload Section with Clear Constraints -->
+        <div class="card upload-card">
+            <h2>Upload Your Document</h2>
+            
+            <div class="constraints-bar">
+                <span class="constraint">📄 Max 30MB</span>
+                <span class="constraint">📃 Up to 100 pages</span>
+                <span class="constraint">🌐 English PDFs</span>
+                <span class="constraint">⚡ ~5-30 seconds</span>
+            </div>
+
+            <div class="upload-zone" id="uploadZone">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <p class="upload-text">Drop PDF here or click to browse</p>
+                <p class="upload-subtext">Your file is processed locally - never stored on our servers</p>
+            </div>
+            <input type="file" id="fileInput" class="file-input" accept=".pdf">
+
+        </div>
+
+        <!-- Processing Indicator -->
+        <div class="card processing-card hidden" id="processingCard">
+            <div class="progress-section">
+                <div class="progress-header">
+                    <h3>Processing your document...</h3>
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-status" id="progressStatus">Loading PDF...</p>
+            </div>
+        </div>
+
+        <!-- Summary Controls -->
+        <div class="card controls-card hidden" id="controlsCard">
+            <h2>Customize Your Summary</h2>
+            
+            <div class="controls-grid">
+                <!-- Length Control -->
+                <div class="control-group">
+                    <label class="control-label">
+                        <span>Length</span>
+                        <span class="control-hint">How detailed?</span>
+                    </label>
+                    <div class="button-group">
+                        <button class="btn-control active" data-length="short">Short<span class="hint">5-8 points</span></button>
+                        <button class="btn-control" data-length="medium">Medium<span class="hint">10-15 points</span></button>
+                        <button class="btn-control" data-length="detailed">Detailed<span class="hint">15-25 points</span></button>
+                    </div>
+                </div>
+
+                <!-- Style Control -->
+                <div class="control-group">
+                    <label class="control-label">
+                        <span>Format</span>
+                        <span class="control-hint">How to display?</span>
+                    </label>
+                    <div class="button-group">
+                        <button class="btn-control active" data-style="bullets">Bullet Points</button>
+                        <button class="btn-control" data-style="paragraphs">Paragraphs</button>
+                        <button class="btn-control" data-style="outline">Outline</button>
+                    </div>
+                </div>
+
+                <!-- Focus Control -->
+                <div class="control-group">
+                    <label class="control-label">
+                        <span>Focus</span>
+                        <span class="control-hint">What to extract?</span>
+                    </label>
+                    <div class="button-group">
+                        <button class="btn-control active" data-focus="overview">Key Ideas</button>
+                        <button class="btn-control" data-focus="data">Data & Results</button>
+                        <button class="btn-control" data-focus="methods">Methods</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="generateBtn" onclick="generateSummary()">Generate Summary</button>
+        </div>
+
+        <!-- Summary Output -->
+        <div class="card summary-card hidden" id="summaryCard">
+            <div class="summary-header">
+                <h2>Summary</h2>
+                <div class="doc-meta" id="docMeta"></div>
+            </div>
+
+            <div class="summary-actions">
+                <button class="btn-action" onclick="copySummary()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    Copy
+                </button>
+                <button class="btn-action" onclick="downloadTXT()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    TXT
+                </button>
+                <button class="btn-action" onclick="downloadDOCX()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    DOCX
+                </button>
+                <button class="btn-action btn-secondary" onclick="startOver()">New Document</button>
+            </div>
+
+            <div class="summary-content" id="summaryContent"></div>
+
+            <!-- Accuracy Signals -->
+            <div class="accuracy-section">
+                <h3>📍 Source References</h3>
+                <div class="page-references" id="pageReferences"></div>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <div class="demo-section" id="demoSection">
+            <h2>See it in action</h2>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>Sample Input</h3>
+                    <div class="demo-preview">
+                        <p class="demo-text">📄 Research Paper (15 pages)</p>
+                        <p class="demo-desc">"Effects of Climate Change on Coastal Ecosystems"</p>
+                    </div>
+                    <button class="btn-demo" onclick="loadDemo()">Try Demo PDF</button>
+                </div>
+                <div class="demo-card">
+                    <h3>Sample Output</h3>
+                    <div class="demo-preview summary-preview">
+                        <p><strong>Key Finding:</strong> Sea level rise of 3.2mm/year threatens 40% of coastal wetlands</p>
+                        <p><strong>Methodology:</strong> 10-year longitudinal study across 25 sites</p>
+                        <p><strong>Impact:</strong> Biodiversity declined 23% in affected areas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="info-section">
+            <h2>How it works</h2>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Extract Text</h3>
+                    <p>We read your PDF and extract all text content using PDF.js</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Analyze Content</h3>
+                    <p>Advanced algorithm scores sentences based on 10+ factors: keywords, data, structure, and position</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Generate Summary</h3>
+                    <p>Select highest-scoring sentences from each page, ensuring complete document coverage</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq-section">
+            <h2>Common questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Is my document private?</h3>
+                    <p>Yes. Everything runs in your browser. Your PDF is never uploaded to any server. We literally cannot see your files.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What's the quality like?</h3>
+                    <p>We use extractive summarization - pulling actual sentences from your document. No AI hallucinations. What you see is what's in your PDF.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Does it work offline?</h3>
+                    <p>After the first load, yes. The PDF.js library gets cached. Perfect for working on planes or with spotty internet.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What file types work?</h3>
+                    <p>PDFs only. Must be text-based (not scanned images). Up to 30MB and 100 pages.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How accurate is it?</h3>
+                    <p>Very. We show page references for every point. Cross-check anything suspicious. Perfect for research where accuracy matters.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Is it free?</h3>
+                    <p>Completely. No limits, no paywalls, no signup. Open source and free forever.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Privacy First</h3>
+                    <p>Files processed locally. Nothing uploaded. Nothing stored. Check the code yourself - it's open source.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Pricing</h3>
+                    <p><strong>Free:</strong> Unlimited use<br>
+                    <strong>No paid tier:</strong> Everything is free<br>
+                    <strong>No limits:</strong> Use as much as you want</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Technology</h3>
+                    <p>Built with PDF.js (Mozilla) and custom extractive summarization. No LLMs, no training data, no black boxes.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 PDF Summarizer · <a href="https://github.com">Open Source</a> · Made for students and researchers</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
